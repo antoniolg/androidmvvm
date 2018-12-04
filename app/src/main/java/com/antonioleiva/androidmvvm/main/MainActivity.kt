@@ -1,5 +1,6 @@
 package com.antonioleiva.androidmvvm.main
 
+import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
@@ -10,15 +11,21 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
-    private val viewModel = MainViewModel(FindItemsInteractor())
+    private lateinit var viewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        viewModel.stateObservable.addObserver(::updateUI)
+
+        viewModel = ViewModelProviders.of(
+            this,
+            MainViewModelFactory(FindItemsInteractor())
+        )[MainViewModel::class.java]
+
+        viewModel.mainState.observe(::getLifecycle, ::updateUI)
     }
 
-    private fun updateUI(screenState: ScreenState<MainState>) {
+    private fun updateUI(screenState: ScreenState<MainState>?) {
         when (screenState) {
             ScreenState.Loading -> showProgress()
             is ScreenState.Render -> processRenderState(screenState.renderState)
@@ -31,16 +38,6 @@ class MainActivity : AppCompatActivity() {
             is MainState.ShowItems -> setItems(renderState.items)
             is MainState.ShowMessage -> showMessage(renderState.message)
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        viewModel.onResume()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        viewModel.onDestroy()
     }
 
     private fun showProgress() {

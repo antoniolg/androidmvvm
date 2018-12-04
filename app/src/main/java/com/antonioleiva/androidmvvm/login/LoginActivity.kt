@@ -1,5 +1,6 @@
 package com.antonioleiva.androidmvvm.login
 
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -11,18 +12,23 @@ import kotlinx.android.synthetic.main.activity_login.*
 
 class LoginActivity : AppCompatActivity() {
 
-    private val viewModel = LoginViewModel(LoginInteractor())
+    private lateinit var viewModel : LoginViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        viewModel.stateObservable.addObserver(::updateUI)
+        viewModel = ViewModelProviders.of(
+            this,
+            LoginViewModelFactory(LoginInteractor())
+        )[LoginViewModel::class.java]
+
+        viewModel.loginState.observe(::getLifecycle, ::updateUI)
 
         button.setOnClickListener { onLoginClicked() }
     }
 
-    private fun updateUI(screenState: ScreenState<LoginState>) {
+    private fun updateUI(screenState: ScreenState<LoginState>?) {
         when (screenState) {
             ScreenState.Loading -> progress.visibility = View.VISIBLE
             is ScreenState.Render -> processLoginState(screenState.renderState)
@@ -42,8 +48,4 @@ class LoginActivity : AppCompatActivity() {
         viewModel.onLoginClicked(username.text.toString(), password.text.toString())
     }
 
-    override fun onDestroy() {
-        viewModel.onDestroy()
-        super.onDestroy()
-    }
 }

@@ -1,31 +1,41 @@
 package com.antonioleiva.androidmvvm.login
 
-import com.antonioleiva.androidmvvm.Observable
+import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.MutableLiveData
+import android.arch.lifecycle.ViewModel
+import android.arch.lifecycle.ViewModelProvider
 import com.antonioleiva.androidmvvm.ScreenState
 
-class LoginViewModel(private val loginInteractor: LoginInteractor) :
+class LoginViewModel(private val loginInteractor: LoginInteractor) : ViewModel(),
     LoginInteractor.OnLoginFinishedListener {
 
-    val stateObservable = Observable<ScreenState<LoginState>>()
+    private val _loginState: MutableLiveData<ScreenState<LoginState>> = MutableLiveData()
+
+    val loginState: LiveData<ScreenState<LoginState>>
+        get() = _loginState
 
     fun onLoginClicked(username: String, password: String) {
-        stateObservable.callObservers(ScreenState.Loading)
+        _loginState.value = ScreenState.Loading
         loginInteractor.login(username, password, this)
     }
 
-    fun onDestroy() {
-        stateObservable.clearObservers()
-    }
-
     override fun onUsernameError() {
-        stateObservable.callObservers(ScreenState.Render(LoginState.WrongUserName))
+        _loginState.value = ScreenState.Render(LoginState.WrongUserName)
     }
 
     override fun onPasswordError() {
-        stateObservable.callObservers(ScreenState.Render(LoginState.WrongPassword))
+        _loginState.value = ScreenState.Render(LoginState.WrongPassword)
     }
 
     override fun onSuccess() {
-        stateObservable.callObservers(ScreenState.Render(LoginState.Success))
+        _loginState.value = ScreenState.Render(LoginState.Success)
+    }
+}
+
+class LoginViewModelFactory(private val loginInteractor: LoginInteractor) :
+    ViewModelProvider.NewInstanceFactory() {
+
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        return LoginViewModel(loginInteractor) as T
     }
 }
