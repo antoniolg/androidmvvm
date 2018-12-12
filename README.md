@@ -1,5 +1,5 @@
 # Android MVVM sample
 
-This is the sample that will be used to explain the transition from MVP to MVVM in Android.
+Sample code to explain how to migrate from MVP to MVVM, and the differences between them.
 
-Work in progress...
+You can read the article in my blog: https://antonioleiva.com/mvvm-vs-mvp/
