@@ -1,13 +1,13 @@
 package com.antonioleiva.androidmvvm.main
 
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
 import com.antonioleiva.androidmvvm.R
 
 class MainAdapter(private val items: List<String>, private val listener: (String) -> Unit) :
-    RecyclerView.Adapter<MainAdapter.MainViewHolder>() {
+    androidx.recyclerview.widget.RecyclerView.Adapter<MainAdapter.MainViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainViewHolder {
         val v = LayoutInflater.from(parent.context)
@@ -24,7 +24,7 @@ class MainAdapter(private val items: List<String>, private val listener: (String
 
     override fun getItemCount(): Int = items.size
 
-    class MainViewHolder(val textView: TextView) : RecyclerView.ViewHolder(textView) {
+    class MainViewHolder(val textView: TextView) : androidx.recyclerview.widget.RecyclerView.ViewHolder(textView) {
 
     }
 }
